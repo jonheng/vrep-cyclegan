@@ -58,6 +58,28 @@ def feature_extractor(x, nf=16):
         return y
 
 
+def feature_extractor2(x, nf=16):
+    with tf.variable_scope("feature_extractor"):
+        y = lrelu(conv2d(x, out_channels=nf, scope_ext="_1"))
+        y = lrelu(conv2d(y, out_channels=nf * 2, scope_ext="_2"), scope_ext="_2")
+        y = lrelu(conv2d(y, out_channels=nf * 4, scope_ext="_3"), scope_ext="_3")
+        y = lrelu(conv2d(y, out_channels=nf * 8, scope_ext="_4"), scope_ext="_4")
+        y = lrelu(conv2d(y, out_channels=nf * 8, scope_ext="_5"), scope_ext="_5")
+        y = tf.contrib.layers.flatten(y)
+        return y
+
+
+def feature_extractor3(x, nf=16):
+    with tf.variable_scope("feature_extractor"):
+        y = tf.nn.relu(conv2d(x, out_channels=nf, scope_ext="_1"))
+        y = tf.nn.relu(conv2d(y, out_channels=nf * 2, scope_ext="_2"), scope_ext="_2")
+        y = tf.nn.relu(conv2d(y, out_channels=nf * 4, scope_ext="_3"), scope_ext="_3")
+        y = tf.nn.relu(conv2d(y, out_channels=nf * 8, scope_ext="_4"), scope_ext="_4")
+        y = tf.nn.relu(conv2d(y, out_channels=nf * 8, scope_ext="_5"), scope_ext="_5")
+        y = tf.contrib.layers.flatten(y)
+        y = tf.layers.dense(y, units=256, activation=tf.nn.relu)
+        return y
+
 def regressor_head(x):
     with tf.variable_scope("regressor_head"):
         y = tf.layers.dense(x, units=6, activation=None)
