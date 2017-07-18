@@ -10,6 +10,7 @@ def h5py_to_array(dataset, img_shape):
     images = np.array(dataset)
     images = (np.float32(images) - 127.0) / 128.0
     images = np.reshape(images, (images.shape[0],) + img_shape)
+    images = np.flip(images, axis=1)
     return images
 
 

@@ -4,9 +4,7 @@ from vrep_utils import VrepConnection
 from image_utils import *
 
 
-im_function = False
-
-def control(load_model_path, total_episodes=10):
+def control(load_model_path, total_episodes=10, im_function=False):
     # Initialize connection
     connection = VrepConnection()
     connection.synchronous_mode()
@@ -16,8 +14,10 @@ def control(load_model_path, total_episodes=10):
     sess = tf.Session()
     saver = tf.train.import_meta_graph(load_model_path + ".meta")
     saver.restore(sess, load_model_path)
-    pred_op = tf.get_collection("pred")[0]
-    input_op = tf.get_collection("image_batch")[0]
+    # pred_op = tf.get_collection("pred")[0]
+    # input_op = tf.get_collection("image_batch")[0]
+    pred_op = tf.get_collection("reg_pred")[0]
+    input_op = tf.get_collection("reg_input")[0]
 
     # Use client id from connection
     clientID = connection.clientID
@@ -91,7 +91,7 @@ def control(load_model_path, total_episodes=10):
         original_img = img
         if im_function:
             #img = adjust_gamma(img, gamma=2)
-            img = tint_images(img, [1,1,0])
+            img = tint_images(img, [0.25, 0.5, 0.75])
         if (current_episode==1) and (step_counter==1):
             print "Displaying before and after image transformation"
             display_2images(original_img[0], img[0])
@@ -155,5 +155,4 @@ def control(load_model_path, total_episodes=10):
     return
 
 if __name__=="__main__":
-    control("../log/regressor/model.ckpt",
-            total_episodes=10)
+    control("../log/a2b2a_regression/model.ckpt", total_episodes=10, im_function=True)

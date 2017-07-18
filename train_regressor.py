@@ -11,7 +11,7 @@ BATCH_SIZE = 64
 TOTAL_EPOCHS = 50
 SAVE_PERIOD = 10
 TEST_PERIOD = 1
-LOG_DIR = "log/regressor3/"
+LOG_DIR = "log/regressor2/"
 RESTORE = False
 
 """ data """
@@ -47,7 +47,7 @@ mse = tf.reduce_mean(tf.square(label_batch - pred))
 grads = optimizer.compute_gradients(mse, var_list=global_vars)
 # Increment global step every time a train is done
 with tf.control_dependencies([incr_global_step]):
-    train_op = optimizer.apply_gradients(grads)
+    train_op = optimizer.apply_gradients(grads, global_step=global_step)
 
 # epoch_mse = tf.constant(0.0, dtype=tf.float32)
 # epoch_mse_reset = tf.assign(epoch_mse, 0)
@@ -82,7 +82,7 @@ for epoch in range(1, TOTAL_EPOCHS + 1):
         _, mse_eval, step, train_summary_str = sess.run([train_op, mse, global_step, loss_summaries],
                                                         feed_dict={image_batch: train_images[batch_index],
                                                                    label_batch: train_labels[batch_index]})
-        print("Epoch {}, {}/{}, train_mse_loss {}".format(epoch, step_in_epoch, steps_per_epoch, mse_eval))
+        print("Epoch {}, {}/{}, train_mse_loss {}".format(epoch, step_in_epoch + 1, steps_per_epoch, mse_eval))
 
         # At end of epoch
         if (step_in_epoch + 1) == steps_per_epoch:
