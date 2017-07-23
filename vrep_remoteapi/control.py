@@ -86,6 +86,7 @@ def control(load_model_path, total_episodes=10, im_function=False):
         img = np.array(img, dtype=np.uint8)
         img = np.resize(img, (1,) + image_shape)  # resize into proper shape for input to neural network
         img = img.astype('float32')
+        img = np.flip(img, axis=1)
         img = (img - 127.0) / 128.0  # convert image into a range of [-1, 1]
 
         original_img = img
@@ -155,4 +156,4 @@ def control(load_model_path, total_episodes=10, im_function=False):
     return
 
 if __name__=="__main__":
-    control("../log/a2b2a_regression/model.ckpt", total_episodes=10, im_function=True)
+    control("../log/a2b2a_rgen/model.ckpt", total_episodes=10, im_function=True)
