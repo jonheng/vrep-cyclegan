@@ -70,6 +70,12 @@ def regressor_head(x):
         return y
 
 
+def regressor_head_3dof(x):
+    with tf.variable_scope("regressor_head"):
+        y = tf.layers.dense(x, units=3, activation=None)
+        return y
+
+
 def generator(x, nf=32, norm=instancenorm):
     with tf.variable_scope("generator"):
         c0 = tf.pad(x, paddings=[[0, 0], [3, 3], [3, 3], [0, 0]], mode="REFLECT")

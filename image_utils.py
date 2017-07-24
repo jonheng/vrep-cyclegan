@@ -40,7 +40,6 @@ def canny_edges(images, sigma=1, rescale=False):
 
 
 def display(img):
-    # origin lower flips the image from top to bottom (mirror around x-axis)
     img = (img + 1.0) / 2.0
     return plt.imshow(img)
 

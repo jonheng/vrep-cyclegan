@@ -52,6 +52,6 @@ def convert_joint_state_to_vel(joint_state_path, joint_vel_path, steps_per_episo
 
 if __name__ == "__main__":
     print("Dataset utils main")
-    convert_joint_state_to_vel("datasets/3dof-arm/joint_state.txt",
-                               "datasets/3dof-arm/joint_vel.txt",
+    convert_joint_state_to_vel("datasets/3dof-arm-test/joint_state.txt",
+                               "datasets/3dof-arm-test/joint_vel.txt",
                                steps_per_episode=16)
