@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def joint_difference(initial_pos, end_pos, num_joints=3):
@@ -50,8 +51,35 @@ def convert_joint_state_to_vel(joint_state_path, joint_vel_path, steps_per_episo
     return
 
 
+def plot_loss(log_dir, save_path, text_path_list=["train_loss.txt", "test_loss.txt"]):
+    plt_lines = []
+    plt_names = []
+    for path in text_path_list:
+        textfile = open(log_dir + path, "r")
+        data = textfile.readlines()
+        x = []
+        y = []
+        for line in data:
+            line_data = line.rstrip().split(" ")
+            x.append(int(line_data[0]))
+            y.append(float(line_data[1]))
+        plt_line, = plt.plot(x, y)
+        plt_lines.append(plt_line)
+        plt_names.append(path.rstrip(".txt"))
+    plt.legend(plt_lines, plt_names)
+    plt.xlabel("Step")
+    plt.ylabel("Loss")
+    plt.savefig(save_path)
+    return
+
+
 if __name__ == "__main__":
     print("Dataset utils main")
-    convert_joint_state_to_vel("datasets/3dof-arm-test/joint_state.txt",
-                               "datasets/3dof-arm-test/joint_vel.txt",
+    convert_joint_state_to_vel("datasets/3dof-arm-grid/joint_state.txt",
+                               "datasets/3dof-arm-grid/joint_vel.txt",
                                steps_per_episode=16)
+
+    # for i in range(9, 19):
+    #     number_unique_images = 2**i
+    #     plot_loss("log/3dof_regressor_" + str(number_unique_images) + "/", save_path="plots/3dof_regressor_" + str(number_unique_images) + ".png")
+    #     plt.show()

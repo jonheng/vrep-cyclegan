@@ -9,10 +9,10 @@ from model import *
 from PIL import Image
 
 """ HYPER-PARAMETERS """
-NUM_EPISODES = 15707
+NUM_EPISODES = 15707 + 16384
 TOTAL_IMAGES = NUM_EPISODES * 16
 BATCH_SIZE = 16
-NUM_EPOCHS = 5
+NUM_EPOCHS = 3
 MAX_TRAINING_IMAGES = TOTAL_IMAGES * NUM_EPOCHS
 TOTAL_STEPS = MAX_TRAINING_IMAGES / BATCH_SIZE
 RESTORE = False
@@ -20,12 +20,11 @@ NUM_THREADS = 2
 IMG_SHAPE = [128, 128, 3]
 NUM_JOINTS = 3
 
-TRAIN_DIR = "./datasets/3dof-arm-grid/"
+TRAIN_DIR = ["./datasets/3dof-arm-grid/", "./datasets/3dof-arm/"]
 TEST_DIR = "./datasets/3dof-arm-test/"
-LOG_DIR = "./log/3dof_regressor_grid_5epoch/"
-# LOG_DIR = "./log/3dof_regressor_" + str(TOTAL_IMAGES) + "/"
+LOG_DIR = "./log/3dof_regressor_combined/"
 
-TEST_PERIOD = 150
+TEST_PERIOD = 250
 SAVE_PERIOD = 10000
 
 if not os.path.isdir(LOG_DIR):
@@ -38,14 +37,15 @@ def preprocess_image(image_tensor):
     return image
 
 
-def read_labels(label_path, size):
+def read_labels(label_path, size=None):
     """
     Input: Label file path
     Returns: List of labels 
     """
     file = open(label_path, "r")
     data = file.readlines()
-    # size = len(data)
+    if size is None:
+        size = len(data)
     output = np.empty(shape=(size, 3), dtype=np.float32)
     for i in range(size):
         line_array = np.array(data[i].rstrip().split(" "), dtype=np.float32)
@@ -70,11 +70,19 @@ def read_images(image_paths):
         counter += 1
     return image_array
 
-
-train_images_dir = TRAIN_DIR + "images/"
-train_labels_path = TRAIN_DIR + "joint_vel.txt"
-train_images_paths = [train_images_dir + "image" + str(i) + ".jpg" for i in range(1, TOTAL_IMAGES + 1)]
-train_labels_array = read_labels(train_labels_path, size=TOTAL_IMAGES)
+train_images_dir = []
+train_labels_path = []
+train_images_paths = []
+for dir in TRAIN_DIR:
+    train_images_dir.append(dir + "images/")
+    train_labels_path.append(dir + "joint_vel.txt")
+for dir in train_images_dir:
+    train_images_paths += [dir + "image" + str(i) + ".jpg" for i in range(1, len(os.listdir(dir)) + 1)]
+train_labels_array = np.empty(shape=(0, 3), dtype=np.float32)
+for label_path in train_labels_path:
+    train_labels_array = np.concatenate([train_labels_array, read_labels(label_path)])
+print len(train_images_paths)
+print train_labels_array.shape
 train_images = tf.convert_to_tensor(train_images_paths, dtype=tf.string)
 train_labels = tf.convert_to_tensor(train_labels_array, dtype=tf.float32)
 train_input_queue = tf.train.slice_input_producer([train_images, train_labels],

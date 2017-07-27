@@ -76,7 +76,7 @@ def regressor_head_3dof(x):
         return y
 
 
-def generator(x, nf=32, norm=instancenorm):
+def generator(x, nf=16, norm=instancenorm):
     with tf.variable_scope("generator"):
         c0 = tf.pad(x, paddings=[[0, 0], [3, 3], [3, 3], [0, 0]], mode="REFLECT")
         c1 = tf.nn.relu(norm(conv2d(c0, out_channels=nf, filter_size=7, stride=1, padding="VALID", scope_ext="_1"), scope_ext="_c1"))
@@ -89,11 +89,11 @@ def generator(x, nf=32, norm=instancenorm):
         r4 = residual_block(r3, scope_ext="_4")
         r5 = residual_block(r4, scope_ext="_5")
         r6 = residual_block(r5, scope_ext="_6")
-        r7 = residual_block(r6, scope_ext="_7")
-        r8 = residual_block(r7, scope_ext="_8")
-        r9 = residual_block(r8, scope_ext="_9")
+        # r7 = residual_block(r6, scope_ext="_7")
+        # r8 = residual_block(r7, scope_ext="_8")
+        # r9 = residual_block(r8, scope_ext="_9")
 
-        d1 = tf.nn.relu(norm(deconv2d(r9, out_channels=nf * 2, filter_size=3, stride=2, scope_ext="_1"), scope_ext="_d1"))
+        d1 = tf.nn.relu(norm(deconv2d(r6, out_channels=nf * 2, filter_size=3, stride=2, scope_ext="_1"), scope_ext="_d1"))
         d2 = tf.nn.relu(norm(deconv2d(d1, out_channels=nf, filter_size=3, stride=2, scope_ext="_2"), scope_ext="_d2"))
         d2 = tf.pad(d2, paddings=[[0, 0], [3, 3], [3, 3], [0, 0]], mode="REFLECT")
         pred = conv2d(d2, out_channels=3, filter_size=7, stride=1, padding="VALID", scope_ext="_pred")
@@ -101,7 +101,7 @@ def generator(x, nf=32, norm=instancenorm):
         return pred
 
 
-def discriminator(x, nf=32, norm=instancenorm):
+def discriminator(x, nf=16, norm=instancenorm):
     with tf.variable_scope("discriminator"):
         y = lrelu(conv2d(x, out_channels=nf, filter_size=4, stride=2, scope_ext="_1"))
         y = lrelu(norm(conv2d(y, out_channels=nf * 2, filter_size=4, stride=2, scope_ext="_2"), scope_ext="_2"))
